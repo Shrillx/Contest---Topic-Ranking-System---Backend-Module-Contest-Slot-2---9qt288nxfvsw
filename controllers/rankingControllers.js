@@ -94,7 +94,9 @@ const getAssessments = async (req, res) => {
     const assessments = {};
     for(const ranking of userRankings){
       const topic = await Topic.findById(ranking.topic);
+      if(topic){
       assessments[topic.name]= ranking.score;
+      }
     }
 
       const sortedAssessments = Object.fromEntries(
