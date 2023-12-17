@@ -86,6 +86,25 @@ Note: This output indicates that the user has not taken any assessments yet.
 */
 const getAssessments = async (req, res) => {
   //Write your code here
+  try{
+    const userId = req.user._id; 
+    const userRankings = await Ranking.find({user: userId});
+
+
+    const assessments = {};
+    for(const ranking of userRankings){
+      const topic = await Topic.findById(ranking.topic);
+      assessments[topic.name]= ranking.score;
+    }
+
+      const sortedAssessments = Object.fromEntries(
+        Object.entries(assessments).sort(([,a],[,b])=>a-b)
+      );
+      res.status(200).send({assessments:sortedAssessments});
+  } catch(error){
+    console.log(error);
+    res.status(500).send({error: 'Internal Server Error'})
+  }
 };
 
 /*
@@ -110,6 +129,32 @@ If there is an internal server error, the controller returns a JSON object with 
 
 const updateRanking = async (req, res) => {
   //Write your code here
+  try{
+    const {topic: topicName,score} = req.body; 
+    const userId = req.user._id; 
+
+    const topic = await Topic.findOne({name: topicName});
+    if(!topic){
+      return res.status(400).json({error: 'Topic not found'});
+    }
+    let ranking = await Ranking.findOne({user: userId, topic: topic._id});
+
+    if(!ranking){
+      ranking = new Ranking({
+        user: userId, 
+        topic: topic._id,
+        score,
+      });
+    }else{
+      ranking.score = score; 
+    }
+    await ranking.save();
+    res.status(200).json({message: 'Ranking updated successfully'})
+
+  }catch(error){
+    console.log(error);
+    res.status(500).json({error: 'Internal Server Error'});
+  }
 };
 
 module.exports = {

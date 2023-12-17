@@ -14,9 +14,25 @@ score: 85
 }
 */
 const rankingSchema = new mongoose.Schema({
-  //Write your Code Here
+  user:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  topic: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Topic',
+    required: true,
+  },
+  score: {
+    type: Number, 
+    required: true,
+    min: 1, 
+    max: 100,
+  }
 });
 
+rankingSchema.index({score: -1});
 const Ranking = mongoose.model('Ranking', rankingSchema);
 
 module.exports = Ranking;

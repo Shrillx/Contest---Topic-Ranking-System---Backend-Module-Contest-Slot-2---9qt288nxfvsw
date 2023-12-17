@@ -13,6 +13,14 @@ description: "The study of numbers, quantities, and shapes."
 
 const topicSchema = new mongoose.Schema({
   //Write your Code Here
+  name:{
+    type: String,
+    required: true
+  },
+  description:{
+    type: String,
+    required: true
+  }
 });
 
 module.exports = mongoose.model('Topic', topicSchema);
